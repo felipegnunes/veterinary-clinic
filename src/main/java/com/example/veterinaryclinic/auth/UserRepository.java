@@ -1,4 +1,4 @@
-package com.example.veterinaryclinic;
+package com.example.veterinaryclinic.auth;
 
 import java.util.Optional;
 

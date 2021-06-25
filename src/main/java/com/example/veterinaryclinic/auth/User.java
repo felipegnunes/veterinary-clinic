@@ -1,4 +1,4 @@
-package com.example.veterinaryclinic;
+package com.example.veterinaryclinic.auth;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,7 +25,7 @@ public class User implements UserDetails {
     private boolean enabled = true;
 
     @ElementCollection
-    private Set<Role> authorities = new HashSet<>();
+    private Set<UserRole> authorities = new HashSet<>();
 
     public User() {
     }

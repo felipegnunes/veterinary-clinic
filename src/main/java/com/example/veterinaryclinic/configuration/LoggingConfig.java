@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Scope;
 public class LoggingConfig {
 
     @Bean
-    @Scope("prototype")
+    @Scope("prototype") // O que significa isso?
     public Logger logger(final InjectionPoint injectionPoint) {
         if (injectionPoint.getMethodParameter() != null) {
             return LoggerFactory.getLogger(injectionPoint.getMethodParameter().getContainingClass());

@@ -2,6 +2,7 @@ package com.example.veterinaryclinic.configuration.security;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Optional;
 
 import javax.servlet.FilterChain;
@@ -9,10 +10,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.veterinaryclinic.UserRepository;
+import com.example.veterinaryclinic.auth.UserRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -23,13 +26,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final JwtTokenUtil jwtTokenUtil;
-    private final UserRepository userRepository;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
-    public JwtTokenFilter(JwtTokenUtil jwtTokenUtil, UserRepository userRepository) {
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -41,7 +42,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Get jwt token and validate
+        // Get JWT token and validate
         final String token = header.split(" ")[1].trim();
         if (!jwtTokenUtil.validate(token)) {
             chain.doFilter(request, response);
@@ -50,13 +51,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         // Get user identity and set it on the spring security context
         UserDetails userDetails = userRepository.findByUsername(jwtTokenUtil.getUsername(token)).orElse(null);
+        Collection<? extends GrantedAuthority> userAuthorities = Optional.ofNullable(userDetails)
+                .map(UserDetails::getAuthorities).orElse(Arrays.asList());
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-                Optional.ofNullable(userDetails).map(UserDetails::getAuthorities).orElse(Arrays.asList()));
-
+                userAuthorities);
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
         chain.doFilter(request, response);
     }
 

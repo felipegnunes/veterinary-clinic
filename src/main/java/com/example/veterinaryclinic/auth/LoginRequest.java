@@ -1,9 +1,9 @@
-package com.example.veterinaryclinic;
+package com.example.veterinaryclinic.auth;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
-public class AuthRequest {
+public class LoginRequest {
 
     @NotNull
     @Email
@@ -12,10 +12,10 @@ public class AuthRequest {
     @NotNull
     private String password;
 
-    public AuthRequest() {
+    public LoginRequest() {
     }
 
-    public AuthRequest(String username, String password) {
+    public LoginRequest(String username, String password) {
         this.username = username;
         this.password = password;
     }
@@ -24,12 +24,12 @@ public class AuthRequest {
         return username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public void setPassword(String password) {

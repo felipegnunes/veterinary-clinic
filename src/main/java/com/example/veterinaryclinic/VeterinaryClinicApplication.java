@@ -2,6 +2,9 @@ package com.example.veterinaryclinic;
 
 import java.util.List;
 
+import com.example.veterinaryclinic.auth.User;
+import com.example.veterinaryclinic.auth.UserRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

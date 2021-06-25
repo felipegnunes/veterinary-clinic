@@ -4,9 +4,10 @@ import static java.lang.String.format;
 
 import java.util.Date;
 
-import com.example.veterinaryclinic.User;
+import com.example.veterinaryclinic.auth.User;
 
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -22,11 +23,8 @@ public class JwtTokenUtil {
     private final String jwtSecret = "zdtlD3JK56m6wTTgsNFhqzjqP";
     private final String jwtIssuer = "example.io";
 
-    private final Logger logger;
-
-    public JwtTokenUtil(Logger logger) {
-        this.logger = logger;
-    }
+    @Autowired
+    private Logger logger;
 
     public String generateAccessToken(User user) {
         return Jwts.builder().setSubject(format("%s,%s", user.getId(), user.getUsername())).setIssuer(jwtIssuer)

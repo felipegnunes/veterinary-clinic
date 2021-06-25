@@ -2,8 +2,9 @@ package com.example.veterinaryclinic.configuration.security;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.veterinaryclinic.UserRepository;
+import com.example.veterinaryclinic.auth.UserRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -22,13 +23,11 @@ import org.springframework.web.filter.CorsFilter;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserRepository userRepository;
-    private final JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private UserRepository userRepository;
 
-    public SecurityConfig(UserRepository userRepository, JwtTokenFilter jwtTokenFilter) {
-        this.userRepository = userRepository;
-        this.jwtTokenFilter = jwtTokenFilter;
-    }
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -50,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }).and();
 
         // Set permissions on endpoints
-        http.authorizeRequests().antMatchers("/auth/login").permitAll().antMatchers("/test").permitAll().anyRequest()
+        http.authorizeRequests().antMatchers("/auth/*").permitAll().antMatchers("/test").permitAll().anyRequest()
                 .authenticated();
 
         // Add JWT token filter
