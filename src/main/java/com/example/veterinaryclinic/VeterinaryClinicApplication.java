@@ -2,8 +2,13 @@ package com.example.veterinaryclinic;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.security.RolesAllowed;
+import javax.transaction.Transactional;
+
 import com.example.veterinaryclinic.auth.User;
 import com.example.veterinaryclinic.auth.UserRepository;
+import com.example.veterinaryclinic.auth.UserRole;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -26,11 +31,17 @@ public class VeterinaryClinicApplication {
 		SpringApplication.run(VeterinaryClinicApplication.class, args);
 	}
 
-	@RequestMapping("test")
-	public List<User> test() {
-		User user = new User("felipeguimaraesnunes@gmail.com", passwordEncoder.encode("1234"));
-		userRepository.save(user);
-		return userRepository.findAll();
+	@RequestMapping("onlyadmin")
+	@Transactional
+	@RolesAllowed(UserRole.ADMIN)
+	public String onlyadmin() {
+		return "You're an admin";
+	}
+
+	@RequestMapping("onlyuser")
+	@RolesAllowed(UserRole.USER)
+	public String onlyuser() {
+		return "You're an user";
 	}
 
 }

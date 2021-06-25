@@ -2,6 +2,8 @@ package com.example.veterinaryclinic.auth;
 
 import javax.validation.Valid;
 
+import com.example.veterinaryclinic.auth.requests.LoginRequest;
+import com.example.veterinaryclinic.auth.requests.SignupRequest;
 import com.example.veterinaryclinic.configuration.security.JwtTokenUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +29,12 @@ public class AuthController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody @Valid LoginRequest request) {
@@ -43,8 +52,24 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<User> signup(@RequestBody @Valid LoginRequest request) {
-        return ResponseEntity.ok().body(null);
+    public ResponseEntity<User> signup(@RequestBody @Valid SignupRequest request) {
+        try {
+            if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+
+            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            }
+
+            String encodedPassword = passwordEncoder.encode(request.getPassword());
+            User newUser = new User(request.getUsername(), request.getEmail(), encodedPassword);
+            userRepository.save(newUser);
+
+            return ResponseEntity.ok().body(newUser);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
 }
